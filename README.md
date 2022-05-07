@@ -9,6 +9,6 @@ You can build **sw** inplace by doing `cc sw.c -std=c89 -Os -DNDEBUG -g0 -Wall -
 
 And then run with `./sw.exe`
 
-You can also install **sw** by running `./build.sh' which builds **sw** and copies the executable to $HOME/bin so you can easily call `sw.exe` from anywhere.
+You can also install **sw** by running `./build.sh` which builds **sw** and copies the executable to $HOME/bin so you can easily call `sw.exe` from anywhere.
 
 Enjoy!
