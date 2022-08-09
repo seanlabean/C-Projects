@@ -24,9 +24,11 @@ And then run with `mpiexec ./hello_world.exe`
 You can also build and run the program by doing `./run.sh` which does the the compiling, building, and executing in one go.
 
 Your ouptput is highly dependent on the machine you are using, but should look something similar to this:
-```Compiled.
+```
+Compiled.
 Running...
 size = 4 rank = 0
 size = 4 rank = 1
 size = 4 rank = 2
-size = 4 rank = 3```
+size = 4 rank = 3
+```
