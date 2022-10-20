@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "mpc.h"
 /* 
 I am creating a REPL (read, evaluate, print, loop) that prompts me
 for input, accepts any input into an input buffer, parses the input, evaluates
@@ -48,19 +48,19 @@ void add_history(char* unused) {}
 
 int main(int argc, char** argv) {
   /* Print Version and Exit information */
-  puts("Meat Version 0.0.0.1");
+  puts("meat Version 0.0.0.3");
   puts("Press ^C to Exit\n");
 
   /* A never-ending loop */
   while (1) {
     /* Output prompt and get input */
-    char* input = readline("Meat> ");
+    char* input = readline("meat> ");
 
     /* Add input to history */
     add_history(input);
 
     /* Echo back to user */
-    printf("No you're a %s\n", input);
+    printf("You said: %s\n", input);
 
     /* Free retrieved input */
     free(input);

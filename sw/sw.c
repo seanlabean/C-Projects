@@ -42,6 +42,6 @@ main()
 		sleep(1);
 		t--;
 	}while(t >= 0);
-	printf("Ended.");
+	printf("Ended.\n");
 	return 0;
 }

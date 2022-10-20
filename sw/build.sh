@@ -10,7 +10,7 @@ rm -f ./sw.exe
 # cc -std=c89 -DDEBUG -Wall -Wpedantic -Wshadow -Wextra -Werror=implicit-int -Werror=incompatible-pointer-types -Werror=int-conversion -Wvla -g -Og -fsanitize=address -fsanitize=undefined -o sw sw.c
 
 # Build(fast)
-cc sw.c -std=c89 -Os -DNDEBUG -g0 -s -Wall -o sw.exe
+cc sw.c -std=c89 -Os -DNDEBUG -g0 -Wall -o sw.exe
 
 # Size
 echo "Size: $(du -sk ./sw.exe)"
