@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "mpc.h"
+#include "./mpc.h"
 /* 
 I am creating a REPL (read, evaluate, print, loop) that prompts me
 for input, accepts any input into an input buffer, parses the input, evaluates
@@ -47,23 +47,49 @@ void add_history(char* unused) {}
 //static char input[2048];
 
 int main(int argc, char** argv) {
+  /* Create Some Parsers */
+  mpc_parser_t* Number   = mpc_new("number");
+  mpc_parser_t* Operator = mpc_new("operator");
+  mpc_parser_t* Expr     = mpc_new("expr");
+  mpc_parser_t* Sartoris = mpc_new("sartoris");
+
+  /* Define them with the following Language */
+  mpca_lang(MPCA_LANG_DEFAULT,
+  "                                                     \
+    number   : /-?[0-9]+/ ;                             \
+    operator : '+' | '-' | '*' | '/' ;                  \
+    expr     : <number> | '(' <operator> <expr>+ ')' ;  \
+    sartoris : /^/ <operator> <expr>+ /$/ ;             \
+  ",
+  Number, Operator, Expr, Sartoris);
+
   /* Print Version and Exit information */
-  puts("meat Version 0.0.0.3");
+  puts("Welcome to Sartoris Version 0.0.0.3");
   puts("Press ^C to Exit\n");
 
   /* A never-ending loop */
   while (1) {
     /* Output prompt and get input */
-    char* input = readline("meat> ");
+    char* input = readline("Sartoris > ");
 
     /* Add input to history */
     add_history(input);
 
-    /* Echo back to user */
-    printf("You said: %s\n", input);
+    /* Attempt to Parse the user Input */
+    mpc_result_t r;
+    if (mpc_parse("<stdin>", input, Sartoris, &r)) {
+      /* On Success Print the AST */
+      mpc_ast_print(r.output);
+      mpc_ast_delete(r.output);
+    } else {
+      /* Otherwise Print the Error */
+      mpc_err_print(r.error);
+      mpc_err_delete(r.error);
+    }
 
     /* Free retrieved input */
     free(input);
   }
+  mpc_cleanup(4, Number, Operator, Expr, Sartoris);
   return 0;
 }
