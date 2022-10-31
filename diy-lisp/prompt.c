@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./mpc.h"
+#include "./utils.h"
+
 /* 
 I am creating a REPL (read, evaluate, print, loop) that prompts me
 for input, accepts any input into an input buffer, parses the input, evaluates
@@ -44,12 +46,18 @@ void add_history(char* unused) {}
 #include <editline/readline.h>
 #endif
 
-/* Use operator strong to see which operation to perform */
+/* Use operator string to see which operation to perform */
 long eval_op(long x, char* op, long y){
   if (strcmp(op, "+") == 0) { return x + y; }
   if (strcmp(op, "-") == 0) { return x - y; }
   if (strcmp(op, "*") == 0) { return x * y; }
   if (strcmp(op, "/") == 0) { return x / y; }
+  if (strcmp(op, "^") == 0) { return pow(x,y); }
+  if (strcmp(op, "%") == 0) { return x % y; }
+  if (strcmp(op, "max") == 0) { return MAX(x,y); }
+  if (strcmp(op, "min") == 0) { return MIN(x,y); }
+  if (strcmp(op, "<") == 0) { return x < y; }
+  if (strcmp(op, ">") == 0) { return x > y; }
   return 0;
 }
 
@@ -87,7 +95,8 @@ int main(int argc, char** argv) {
   mpca_lang(MPCA_LANG_DEFAULT,
   "                                                     \
     number   : /-?[0-9]+/ ;                             \
-    operator : '+' | '-' | '*' | '/' ;                  \
+    operator : '+' | '-' | '*' | '/' | '^' | '%'        \
+             | \"max\" | \"min\" | '<' | '>' ;		\
     expr     : <number> | '(' <operator> <expr>+ ')' ;  \
     sartoris : /^/ <operator> <expr>+ /$/ ;             \
   ",
@@ -100,7 +109,7 @@ int main(int argc, char** argv) {
   /* A never-ending loop */
   while (1) {
     /* Output prompt and get input */
-    char* input = readline("Sartoris > ");
+    char* input = readline("Sartoris $: ");
 
     /* Add input to history */
     add_history(input);
