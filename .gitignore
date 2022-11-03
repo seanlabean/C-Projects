@@ -55,4 +55,4 @@ dkms.conf
 *~
 
 # Executable folder
-./diy-lisp/exec/
+**/exec
