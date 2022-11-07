@@ -172,13 +172,13 @@ int main(int argc, char** argv) {
   Number, Operator, Expr, Sartoris);
 
   /* Print Version and Exit information */
-  puts("Welcome to Sartoris Version 0.0.0.3");
+  puts("Welcome to Derivative Invesitigation of Coding Knowledge v0.1");
   puts("Press ^C to Exit\n");
 
   /* A never-ending loop */
   while (1) {
     /* Output prompt and get input */
-    char* input = readline("Sartoris $: ");
+    char* input = readline("8==D~ ");
 
     /* Add input to history */
     add_history(input);
