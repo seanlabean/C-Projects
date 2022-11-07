@@ -36,3 +36,15 @@ size = 4 rank = 3
 ## diy-lisp
 
 https://www.buildyourownlisp.com/
+
+## encrypt
+
+Recently I've been watching Youtube videos on OpSec and encryption and I realized that I do not properly know how encryption works. This project means to teach me. I (will) have several iterations of encryption/decryption methods.
+
+### ascii-shift.c
+
+ASCII-shift is a very simple method of encryption in which all ASCII values of a text characters in a to-be encrypted file are shifted by some user-defined integer. The result, even with a small shift, is relatively unintelligable. I consider this a basic level of encryption akin to a [Caesar Cipher](https://en.wikipedia.org/wiki/Caesar_cipher). Decryption should be relatively simple and can be brute forced by either searching a range of integer shifts or testing for character-doublets (e.g. 'ee', 'oo', 'll') or the single characters 'i/I' and 'a/A'. This program allows for user control of the integer shift and handles simple type and missing file errors.
+
+You can build **ascii-shift.exe** by doing `gcc ascii-shift.c -o ascii-shift.exe`
+
+And then run by providing the file-to-encrypt, encrypted file name, and integer shift: `./ascii-shift.exe sample.txt sample-ascii-shift.txt 42`

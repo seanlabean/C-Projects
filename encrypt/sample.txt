@@ -1,0 +1,8 @@
+Hello World! This is a sample text file to test encryption algorithms.
+
+(To test the limits of my algorithms, I am including as many text characters as possible.)
+
+<?> / [] {} () 1234567890 _-+=`~!@#$%^&*
+\|:";'
+
+- S. C. L.
