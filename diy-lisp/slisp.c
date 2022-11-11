@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "./mpc.h"
 #include "./utils.h"
 
@@ -58,7 +59,7 @@ a pointer to its pointer. */
 
 typedef struct lval {
   int type;
-  long num;
+  double num;
   /* Error and Symbol types are static in memory. */
   char* err;
   char* sym;
@@ -208,7 +209,7 @@ void lval_expr_print(lval* v, char open, char close) {
 
 void lval_print(lval* v) {
   switch (v->type) {
-    case LVAL_NUM:   printf("%li", v->num); break;
+    case LVAL_NUM:   printf("%.2f", v->num); break;
     case LVAL_ERR:   printf("Error: %s", v->err); break;
     case LVAL_SYM:   printf("%s", v->sym); break;
     case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
@@ -308,7 +309,7 @@ lval* builtin_op(lval* a, char* op) {
       x->num /= y->num;
     }
     if (strcmp(op, "^") == 0) { x->num = pow(x->num,y->num); }
-    if (strcmp(op, "%") == 0) { x->num = x->num % y->num; }
+    if (strcmp(op, "%") == 0) { x->num = fmod(x->num, y->num); }
     if (strcmp(op, "max") == 0) { x->num = MAX(x->num, y->num); }
     if (strcmp(op, "min") == 0) { x->num = MIN(x->num, y->num); }
     if (strcmp(op, ">") == 0) { x->num = x->num > y->num; }
@@ -433,7 +434,8 @@ int main(int argc, char** argv) {
   Number, Symbol, Sexpr, Expr, Sartoris);
 
   /* Print Version and Exit information */
-  puts("Welcome to SLISP v0.6");
+  puts("  _____\n (' V ') .o0 |Welcome to Sean's LISP!|\n((_____))\n    ^^");
+  //puts("Welcome to SLISP v0.6");
   puts("Press ^C to Exit\n");
 
   /* A never-ending loop */
