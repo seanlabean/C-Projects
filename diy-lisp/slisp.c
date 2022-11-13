@@ -50,11 +50,11 @@ void add_history(char* unused) {}
 /* Create enumeration of possible error types */
 enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
 /* Create enumeration of possible lval types */
-enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR };
+enum { LVAL_ERR, LVAL_NUM, LVAL_SYM, LVAL_SEXPR, LVAL_QEXPR };
 
 /* Declare new struct called lval. This allows the \
 LERR/LVAL enums to be passed. Structure points to set
-S-Expressions in memory when able and self-contains
+S&Q-Expressions in memory when able and self-contains
 a pointer to its pointer. */
 
 typedef struct lval {
@@ -105,6 +105,14 @@ lval* lval_sexpr(void) {
   return v;
 }
 
+lval* lval_qexpr(void) {
+  lval* v = malloc(sizeof(lval));
+  v->type = LVAL_QEXPR;
+  v->count = 0;
+  v->cell = NULL;
+  return v;
+}
+
 //typedef struct {
 //  int type;
 //  long num;
@@ -136,7 +144,8 @@ void lval_del(lval* v) {
     case LVAL_ERR: free(v->err); break;
     case LVAL_SYM: free(v->sym); break;
 
-    /* If Sexpr then delete all elements inside */
+    /* If Sexpr or Qexpr then delete all elements inside */
+    case LVAL_QEXPR:
     case LVAL_SEXPR:
       for (int i = 0; i < v->count; i++) {
         lval_del(v->cell[i]);
@@ -179,11 +188,14 @@ lval* lval_read(mpc_ast_t* t) {
   lval* x = NULL;
   if (strcmp(t->tag, ">") == 0) { x = lval_sexpr(); }
   if (strstr(t->tag, "sexpr")) { x = lval_sexpr(); }
+  if (strstr(t->tag, "qexpr")) { x = lval_qexpr(); }
 
   /* Fill this list with any valid expression contained within */
   for (int i = 0; i < t->children_num; i++) {
     if (strcmp(t->children[i]->contents, "(") == 0) { continue; }
     if (strcmp(t->children[i]->contents, ")") == 0) { continue; }
+    if (strcmp(t->children[i]->contents, "{") == 0) { continue; }
+    if (strcmp(t->children[i]->contents, "}") == 0) { continue; }
     if (strcmp(t->children[i]->tag,  "regex") == 0) { continue; }
     x = lval_add(x, lval_read(t->children[i]));
   }
@@ -213,6 +225,7 @@ void lval_print(lval* v) {
     case LVAL_ERR:   printf("Error: %s", v->err); break;
     case LVAL_SYM:   printf("%s", v->sym); break;
     case LVAL_SEXPR: lval_expr_print(v, '(', ')'); break;
+    case LVAL_QEXPR: lval_expr_print(v, '{', '}'); break;
   }
 }
 
@@ -241,6 +254,10 @@ void lval_print(lval* v) {
 
 /* Print an "lval" followed by a newline */
 void lval_println(lval* v) { lval_print(v); putchar('\n'); }
+
+/* Macro for error testing */
+#define LASSERT(args, cond, err) \
+  if (!(cond)) { lval_del(args); return lval_err(err); }
 
 /* S-Expression lval type manipulators (lval_pop, lval_take). */
 
@@ -281,10 +298,12 @@ expression and deletes old args. */
 lval* builtin_op(lval* a, char* op) {
   /* Ensure all args are numbers */
   for (int i = 0; i < a->count; i++) {
-    if (a->cell[i]->type != LVAL_NUM) {
-      lval_del(a);
-      return lval_err("Cannot operate on non-number!");
-    }
+    LASSERT(a, a->cell[i]->type == LVAL_NUM,
+      "Cannot operate on non-number!");
+    //if (a->cell[i]->type != LVAL_NUM) {
+    //  lval_del(a);
+    //  return lval_err("Cannot operate on non-number!");
+    //}
   }
   /* Pop first element */
   lval* x = lval_pop(a, 0);
@@ -319,7 +338,104 @@ lval* builtin_op(lval* a, char* op) {
   lval_del(a); return x;
 }
 
+/* builtin functions for head, tail, list, eval Q-Expr calls */
+lval* builtin_head(lval* a) {
+  /* Check Error Conditions */
+  LASSERT(a, a->count == 1, 
+    "Function 'head' passed too many arguments!");
+  LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+    "Function 'head' passed incorrect types!");
+  LASSERT(a, a->cell[0]->count != 0,
+    "Function 'head' passed {}!")
+
+  /* Otherwise take the first argument */
+  lval* v = lval_take(a, 0);
+
+  /* Delete all elements that are not head and return */
+  while (v->count > 1) { lval_del(lval_pop(v, 1)); }
+  return v;
+}
+
+lval* builtin_tail(lval* a) {
+  /* Check Error Conditions */
+  if (a->count != 1) {
+    lval_del(a);
+    return lval_err("Function 'tail' passed too many arguments!");
+  }
+  if (a->cell[0]->type != LVAL_QEXPR) {
+    lval_del(a);
+    return lval_err("Function 'tail' passed incorrect types!");
+  }
+  if (a->cell[0]->count == 0) {
+    lval_del(a);
+    return lval_err("Function 'tail' passed {}!");
+  }
+
+  /* Take first argument */
+  lval* v = lval_take(a, 0);
+
+  /* Delete first element and return */
+  lval_del(lval_pop(v, 0));
+  return v;
+}
+
+lval* builtin_list(lval* a) {
+  a->type = LVAL_QEXPR;
+  return a;
+}
+
 lval* lval_eval(lval* v); // for compilation
+
+lval* builtin_eval(lval* a) {
+  LASSERT(a, a->count == 1, 
+    "Function 'eval' passed too many arguments!");
+  LASSERT(a, a->cell[0]->type == LVAL_QEXPR,
+    "Function 'eval' passed incorrect type!");
+  
+  lval* x = lval_take(a,0);
+  x->type = LVAL_SEXPR;
+  return lval_eval(x);
+}
+
+lval* lval_join(lval* x, lval* y) {
+  /* for each cell in 'y' add it to 'x' */
+  while (y->count) {
+    x = lval_add(x, lval_pop(y,0));
+  }
+
+  /* Delete the empty 'y' and return 'x' */
+  lval_del(y);
+  return x;
+}
+
+lval* builtin_join(lval* a) {
+  for (int i = 0; i < a->count; i++) {
+    LASSERT(a, a->cell[i]->type == LVAL_QEXPR,
+      "Function 'join' passed incorrect type.");
+  }
+
+  lval* x = lval_pop(a, 0);
+  
+  while (a->count) {
+    x = lval_join(x, lval_pop(a, 0));
+  }
+
+  lval_del(a);
+  return x;
+}
+
+lval* builtin(lval* a, char* func) {
+  if (strcmp("list", func) == 0) { return builtin_list(a); }
+  if (strcmp("head", func) == 0) { return builtin_head(a); }
+  if (strcmp("tail", func) == 0) { return builtin_tail(a); }
+  if (strcmp("join", func) == 0) { return builtin_join(a); }
+  if (strcmp("eval", func) == 0) { return builtin_eval(a); }
+  if (strstr("+-/*^%maxmin<>", func)) { return builtin_op(a, func); }
+  lval_del(a);
+  return lval_err("Unknown Function!");
+}
+
+
 /* S-Expression evaluator. Iteratively check expression for children and evaluate, 
 check and express errors. Check for empty expression, return. Check that first 
 element is a symbol, return err if not, the evaluate symbol with operator builtin.  */
@@ -345,7 +461,7 @@ lval* lval_eval_sexpr(lval* v) {
     return lval_err("S-expression does not start with symbol!");
   }
   /* Call builtin with operator */
-  lval* result = builtin_op(v, f->sym);
+  lval* result = builtin(v, f->sym);
   lval_del(f);
   return result;
 }
@@ -418,6 +534,7 @@ int main(int argc, char** argv) {
   mpc_parser_t* Number   = mpc_new("number");
   mpc_parser_t* Symbol   = mpc_new("symbol");
   mpc_parser_t* Sexpr    = mpc_new("sexpr");
+  mpc_parser_t* Qexpr    = mpc_new("qexpr");
   mpc_parser_t* Expr     = mpc_new("expr");
   mpc_parser_t* Sartoris = mpc_new("sartoris");
 
@@ -425,13 +542,16 @@ int main(int argc, char** argv) {
   mpca_lang(MPCA_LANG_DEFAULT,
   "                                                     \
     number   : /-?[0-9]+/ ;                             \
-    symbol  : '+' | '-' | '*' | '/' | '^' | '%'        \
+    symbol  : \"list\" | \"head\" | \"tail\"            \
+             | \"join\" | \"eval\" | '+' | '-'          \
+             | '*' | '/' | '^' | '%'                    \
              | \"max\" | \"min\" | '<' | '>' ;		      \
     sexpr    : '(' <expr>* ')' ;                        \
-    expr     : <number> | <symbol> | <sexpr> ;          \
+    qexpr    : '{' <expr>* '}' ;                        \
+    expr     : <number> | <symbol> | <sexpr> | <qexpr> ;\
     sartoris : /^/ <expr>* /$/ ;                        \
   ",
-  Number, Symbol, Sexpr, Expr, Sartoris);
+  Number, Symbol, Sexpr, Qexpr, Expr, Sartoris);
 
   /* Print Version and Exit information */
   puts("  _____\n (' V ') .o0 |Welcome to Sean's LISP!|\n((_____))\n    ^^");
@@ -441,7 +561,7 @@ int main(int argc, char** argv) {
   /* A never-ending loop */
   while (1) {
     /* Output prompt and get input */
-    char* input = readline("SLISP ~> ");
+    char* input = readline(">>--> ");
 
     /* Add input to history */
     add_history(input);
@@ -467,7 +587,7 @@ int main(int argc, char** argv) {
     free(input);
   }
   
-  mpc_cleanup(5, Number, Symbol, Sexpr, Expr, Sartoris);
+  mpc_cleanup(6, Number, Symbol, Sexpr, Qexpr, Expr, Sartoris);
   
   return 0;
 }
