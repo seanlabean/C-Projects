@@ -1,6 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+class AShape
+{
+public:
+    sf::CircleShape circle;
+    sf::RectangleShape rect;
+    float speedX, speedY;
+};
 int main()
 {
     // create window of size w*h pixels
@@ -37,6 +44,8 @@ int main()
     // place text
     sf::Text text("SAMPLE TEXT sample text", myFont, 36);
     text.setPosition(0, wHeight-(float)text.getCharacterSize());
+
+    // reading in multiple shapes
 
     // main loop
     while (window.isOpen())
