@@ -57,6 +57,7 @@ dkms.conf
 # Executable folder
 **/exec
 **/execs
+**/bin
 
 # vscode junk
 *vscode/
