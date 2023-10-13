@@ -29,6 +29,10 @@ int main()
 
     std::vector<sf::CircleShape> circles;
     std::vector<sf::RectangleShape> rectangles;
+    std::vector<float> rectanglesVx;
+    std::vector<float> rectanglesVy;
+    std::vector<float> circlesVx;
+    std::vector<float> circlesVy;
 
     while (fin >> name)
     {
@@ -41,47 +45,42 @@ int main()
         } else if (name=="Circle")
         {
             fin >> circleColor >> circleX >> circleY >> circleVx >> circleVy >> circleColorR >> circleColorG >> circleColorB >> circleR;
+
             sf::CircleShape c(circleR);
             c.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
             c.setPosition(circleX, circleY);
             
             circles.push_back(c);
+            circlesVx.push_back(circleVx);
+            circlesVy.push_back(circleVy);
 
         }else if (name=="Rectangle")
         {
             fin >> rectColor >> rectX >> rectY >> rectVx >> rectVy >> rectColorR >> rectColorG >> rectColorB >> rectW >> rectH;
+
             sf::Vector2f rSize(rectW, rectH);
             sf::RectangleShape rect(rSize);
             rect.setPosition(rectX, rectY);
             rect.setFillColor(sf::Color(rectColorR,rectColorG,rectColorB));
 
             rectangles.push_back(rect);
+            rectanglesVx.push_back(rectVx);
+            rectanglesVy.push_back(rectVy);
 
         }else
         {
-            std::cerr << "Line head is not recognized, skipping.";
+            // Not sure how to only print out first line unit once
+            // since this will trigger each time any line unit
+            // in the offending line isn't recognized.
+            continue;
         }
     }
-
-    //readFromConfig("config");
 
     // create window of size w*h pixels
     // top left of window is (0,0) and bottom right is (w,h)
 
     sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), "SFML works!");
     window.setFramerateLimit(60);
-
-    // make a shape, set its size, color, position, velocity
-    //sf::CircleShape circle(circleR);
-    //circle.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
-    //circle.setPosition(circleX, circleY);
-
-    //sf::Vector2f rSize(rectW, rectH);
-    //sf::RectangleShape rect(rSize);
-    //rect.setPosition(rectX, rectY);
-    //rect.setFillColor(sf::Color(rectColorR,rectColorG,rectColorB));
-    //rect.setOutlineColor(sf::Color::Red);
-    //rect.setOutlineThickness(15);
 
     // start Font instance, load Font and check for success
     sf::Font myFont;
@@ -112,7 +111,7 @@ int main()
             if (event.type == sf::Event::KeyPressed)
             {
                 // print code of key that was pressed
-                std::cout << "Key pressed with code = " << event.key.code << "\n";
+                //std::cout << "Key pressed with code = " << event.key.code << "\n";
                 if (event.key.code == sf::Keyboard::X)
                 {
                     // reverse the shape velocity direction here.
@@ -123,6 +122,7 @@ int main()
         window.clear();
         for (auto& circle : circles)
         {
+            // maybe do something here like iterate over the many vectors I have by tracking the for loop iteration in reference to the size of circles vector?
             window.draw(circle);
             circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
         }
@@ -131,13 +131,6 @@ int main()
             window.draw(rectangle);
             rectangle.setPosition(rectangle.getPosition().x + rectVx, rectangle.getPosition().y + rectVy);
         }
-        //circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
-
-        //rect.rotate(0.1);
-
-
-        //window.draw(circle);
-        //window.draw(rect);
         window.draw(text);
         window.display();       // controls OpenGL display buffers
     }
