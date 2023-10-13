@@ -10,9 +10,13 @@ public:
     sf::Color color;
     std::string name;
     float px, py, vx, vy;
+    float width, height, radius;
+    int ColorR, ColorG, ColorB;
 };
-void readFromConfig(const std::string& filename)
+
+int main()
 {
+    std::string filename="config";
     std::ifstream fin(filename);
     std::string name, fontLoc, circleColor, rectColor;
     int fontSize, fontColorR, fontColorG, fontColorB;
@@ -22,6 +26,9 @@ void readFromConfig(const std::string& filename)
     float circleX, circleY, rectX, rectY;
     float circleVx, circleVy, rectVx, rectVy;
     float circleR, rectW, rectH;
+
+    std::vector<sf::CircleShape> circles;
+    std::vector<sf::RectangleShape> rectangles;
 
     while (fin >> name)
     {
@@ -34,52 +41,59 @@ void readFromConfig(const std::string& filename)
         } else if (name=="Circle")
         {
             fin >> circleColor >> circleX >> circleY >> circleVx >> circleVy >> circleColorR >> circleColorG >> circleColorB >> circleR;
+            sf::CircleShape c(circleR);
+            c.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
+            c.setPosition(circleX, circleY);
+            
+            circles.push_back(c);
+
         }else if (name=="Rectangle")
         {
             fin >> rectColor >> rectX >> rectY >> rectVx >> rectVy >> rectColorR >> rectColorG >> rectColorB >> rectW >> rectH;
+            sf::Vector2f rSize(rectW, rectH);
+            sf::RectangleShape rect(rSize);
+            rect.setPosition(rectX, rectY);
+            rect.setFillColor(sf::Color(rectColorR,rectColorG,rectColorB));
+
+            rectangles.push_back(rect);
+
+        }else
+        {
+            std::cerr << "Line head is not recognized, skipping.";
         }
     }
-    std::cout << name << " " << wWidth << " " << wHeight << "\n";
-    std::cout << fontLoc << " " << fontSize << "\n";
-    std::cout << rectColor << " " << rectW << " " << rectH << "\n";
-}
-int main()
-{
-    readFromConfig("config");
+
+    //readFromConfig("config");
 
     // create window of size w*h pixels
     // top left of window is (0,0) and bottom right is (w,h)
-    const int wWidth = 1000;
-    const int wHeight  = 600;
+
     sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), "SFML works!");
     window.setFramerateLimit(60);
 
     // make a shape, set its size, color, position, velocity
-    sf::CircleShape circle(100.f);
-    circle.setFillColor(sf::Color::Magenta);
-    circle.setPosition(200.f, 200.f);
-    float circleMoveSpeed = 0.01f;
+    //sf::CircleShape circle(circleR);
+    //circle.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
+    //circle.setPosition(circleX, circleY);
 
-    float rx = 300;
-    float ry = 200;
-    sf::Vector2f rSize(rx, ry);
-    sf::RectangleShape rect(rSize);
-    rect.setPosition(100.f, 5.f);
-    rect.setFillColor(sf::Color(255,255,0));
-    rect.setOutlineColor(sf::Color::Red);
-    rect.setOutlineThickness(15);
+    //sf::Vector2f rSize(rectW, rectH);
+    //sf::RectangleShape rect(rSize);
+    //rect.setPosition(rectX, rectY);
+    //rect.setFillColor(sf::Color(rectColorR,rectColorG,rectColorB));
+    //rect.setOutlineColor(sf::Color::Red);
+    //rect.setOutlineThickness(15);
 
     // start Font instance, load Font and check for success
     sf::Font myFont;
 
-    if(!myFont.loadFromFile("fonts/MiraiSeu.ttf"))
+    if(!myFont.loadFromFile(fontLoc))
     {
         std::cerr << "Could not load font!\n";
         exit(-1);
     }
 
     // place text
-    sf::Text text("SAMPLE TEXT sample text", myFont, 36);
+    sf::Text text("SAMPLE TEXT sample text", myFont, fontSize);
     text.setPosition(0, wHeight-(float)text.getCharacterSize());
 
     // reading in multiple shapes
@@ -106,15 +120,24 @@ int main()
             }
         }
 
-        float sx = 0.5f;
-        float sy = 0.5f;
-        circle.setPosition(circle.getPosition().x + sx, circle.getPosition().y + sy);
-
-        rect.rotate(0.1);
-
         window.clear();
-        window.draw(circle);
-        window.draw(rect);
+        for (auto& circle : circles)
+        {
+            window.draw(circle);
+            circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
+        }
+        for (auto& rectangle : rectangles)
+        {
+            window.draw(rectangle);
+            rectangle.setPosition(rectangle.getPosition().x + rectVx, rectangle.getPosition().y + rectVy);
+        }
+        //circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
+
+        //rect.rotate(0.1);
+
+
+        //window.draw(circle);
+        //window.draw(rect);
         window.draw(text);
         window.display();       // controls OpenGL display buffers
     }

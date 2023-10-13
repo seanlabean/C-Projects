@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-c -Wall -std=c++17 
-LDFLAGS=
+CFLAGS=-c -Wall
+LDFLAGS=-std=c++17
 LIBFLAGS=-lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 SOURCES=src/* #main.cpp Control.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
