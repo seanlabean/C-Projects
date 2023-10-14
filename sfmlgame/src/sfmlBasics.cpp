@@ -96,7 +96,7 @@ int main()
     text.setPosition(0, wHeight-(float)text.getCharacterSize());
 
     // reading in multiple shapes
-
+    std::cout << circlesVx[0] << " " << circlesVx[1];
     // main loop
     while (window.isOpen())
     {
@@ -120,16 +120,29 @@ int main()
         }
 
         window.clear();
-        for (auto& circle : circles)
+        // for (auto& circle : circles)
+        // {
+        //     // maybe do something here like iterate over the many vectors I have by tracking the for loop iteration in reference to the size of circles vector?
+        //     window.draw(circle);
+        //     circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
+        // }
+        for (int ind = 0; ind < circles.size(); ++ind)
         {
-            // maybe do something here like iterate over the many vectors I have by tracking the for loop iteration in reference to the size of circles vector?
-            window.draw(circle);
-            circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
+            auto& circ = circles[ind];
+            auto& cVx = circlesVx[ind];
+            auto& cVy = circlesVy[ind];
+
+            window.draw(circles[ind]);
+            circ.setPosition(circ.getPosition().x + cVx, circ.getPosition().y + cVy);
         }
-        for (auto& rectangle : rectangles)
+        for (int ind = 0; ind < rectangles.size(); ++ind)
         {
-            window.draw(rectangle);
-            rectangle.setPosition(rectangle.getPosition().x + rectVx, rectangle.getPosition().y + rectVy);
+            auto& rect = rectangles[ind];
+            auto& rVx = rectanglesVx[ind];
+            auto& rVy = rectanglesVy[ind];
+            
+            window.draw(rect);
+            rect.setPosition(rect.getPosition().x + rVx, rect.getPosition().y + rVy);
         }
         window.draw(text);
         window.display();       // controls OpenGL display buffers
