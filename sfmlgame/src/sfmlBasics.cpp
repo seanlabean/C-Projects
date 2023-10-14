@@ -26,6 +26,7 @@ int main()
     float circleX, circleY, rectX, rectY;
     float circleVx, circleVy, rectVx, rectVy;
     float circleR, rectW, rectH;
+    float winBuff = 50;
 
     std::vector<sf::CircleShape> circles;
     std::vector<sf::RectangleShape> rectangles;
@@ -49,11 +50,10 @@ int main()
             sf::CircleShape c(circleR);
             c.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
             c.setPosition(circleX, circleY);
-            
+
             circles.push_back(c);
             circlesVx.push_back(circleVx);
             circlesVy.push_back(circleVy);
-
         }else if (name=="Rectangle")
         {
             fin >> rectColor >> rectX >> rectY >> rectVx >> rectVy >> rectColorR >> rectColorG >> rectColorB >> rectW >> rectH;
@@ -66,7 +66,9 @@ int main()
             rectangles.push_back(rect);
             rectanglesVx.push_back(rectVx);
             rectanglesVy.push_back(rectVy);
-
+        }else if (name=="Buffer")
+        {
+            fin >> winBuff;
         }else
         {
             // Not sure how to only print out first line unit once
@@ -95,8 +97,6 @@ int main()
     sf::Text text("SAMPLE TEXT sample text", myFont, fontSize);
     text.setPosition(0, wHeight-(float)text.getCharacterSize());
 
-    // reading in multiple shapes
-    std::cout << circlesVx[0] << " " << circlesVx[1];
     // main loop
     while (window.isOpen())
     {
@@ -120,12 +120,7 @@ int main()
         }
 
         window.clear();
-        // for (auto& circle : circles)
-        // {
-        //     // maybe do something here like iterate over the many vectors I have by tracking the for loop iteration in reference to the size of circles vector?
-        //     window.draw(circle);
-        //     circle.setPosition(circle.getPosition().x + circleVx, circle.getPosition().y + circleVy);
-        // }
+
         for (int ind = 0; ind < circles.size(); ++ind)
         {
             auto& circ = circles[ind];
@@ -134,6 +129,14 @@ int main()
 
             window.draw(circles[ind]);
             circ.setPosition(circ.getPosition().x + cVx, circ.getPosition().y + cVy);
+
+            if (circ.getPosition().x < 0 - winBuff || circ.getPosition().x + circ.getRadius()*2.0 > wWidth + winBuff)
+            {
+                cVx = -1.0*cVx;
+            } else if (circ.getPosition().y < 0 - winBuff || circ.getPosition().y + circ.getRadius()*2.0 > wHeight + winBuff)
+            {
+                cVy = -1.0*cVy;
+            }
         }
         for (int ind = 0; ind < rectangles.size(); ++ind)
         {
@@ -143,6 +146,14 @@ int main()
             
             window.draw(rect);
             rect.setPosition(rect.getPosition().x + rVx, rect.getPosition().y + rVy);
+
+            if (rect.getPosition().x < 0 - winBuff || rect.getPosition().x + rect.getSize().x > wWidth + winBuff)
+            {
+                rVx = -1.0*rVx;
+            } else if (rect.getPosition().y < 0 - winBuff || rect.getPosition().y + rect.getSize().y*0.975 > wHeight + winBuff)
+            {
+                rVy = -1.0*rVy;
+            }
         }
         window.draw(text);
         window.display();       // controls OpenGL display buffers
