@@ -1,8 +1,9 @@
 Window 800 600
-Font fonts/MiraiSeu.ttf 42 255 255 255
+Font fonts/NewHeterodoxMono-Book.otf 24 255 255 255
 Buffer 5
 Fake line 59 83.0 for error testing
 Circle CGreen 100 100 -3.3 0.2 0 255 0 50
 Circle CPurple 300 300 -0.6 -2.1 255 0 255 75
 Rectangle RRed 200 200 1.1 2.15 255 0 0 50 25
 Rectangle RTeal 25 100 -0.7 -0.2 0 255 255 100 100
+Circle Ashley'sBall 550 450 8.0 -5.0 69 69 69 40

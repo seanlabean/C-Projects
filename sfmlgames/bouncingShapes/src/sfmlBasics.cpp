@@ -18,7 +18,7 @@ int main()
 {
     std::string filename="config";
     std::ifstream fin(filename);
-    std::string name, fontLoc, circleColor, rectColor;
+    std::string name, fontLoc="fonts/MiraiSeu.ttf", circleLabel="circ", rectLabel="rect";
     int fontSize, fontColorR, fontColorG, fontColorB;
     int circleColorR, circleColorG, circleColorB;
     int rectColorR, rectColorG, rectColorB;
@@ -27,13 +27,12 @@ int main()
     float circleVx, circleVy, rectVx, rectVy;
     float circleR, rectW, rectH;
     float winBuff = 50;
+    sf::Font myFont;
 
     std::vector<sf::CircleShape> circles;
     std::vector<sf::RectangleShape> rectangles;
-    std::vector<float> rectanglesVx;
-    std::vector<float> rectanglesVy;
-    std::vector<float> circlesVx;
-    std::vector<float> circlesVy;
+    std::vector<float> rectanglesVx, rectanglesVy, circlesVx, circlesVy;
+    std::vector<sf::Text> rectanglesLabel, circlesLabel;
 
     while (fin >> name)
     {
@@ -43,9 +42,16 @@ int main()
         } else if (name=="Font")
         {
             fin >> fontLoc >> fontSize >> fontColorR >> fontColorG >> fontColorB;
+            // start Font instance, load Font and check for success
+            if(!myFont.loadFromFile(fontLoc))
+            {
+                std::cerr << "Could not load font!\n";
+                exit(-1);
+            }
+
         } else if (name=="Circle")
         {
-            fin >> circleColor >> circleX >> circleY >> circleVx >> circleVy >> circleColorR >> circleColorG >> circleColorB >> circleR;
+            fin >> circleLabel >> circleX >> circleY >> circleVx >> circleVy >> circleColorR >> circleColorG >> circleColorB >> circleR;
 
             sf::CircleShape c(circleR);
             c.setFillColor(sf::Color(circleColorR,circleColorG,circleColorB));
@@ -54,9 +60,11 @@ int main()
             circles.push_back(c);
             circlesVx.push_back(circleVx);
             circlesVy.push_back(circleVy);
+            sf::Text text(circleLabel, myFont, fontSize);
+            circlesLabel.push_back(text);
         }else if (name=="Rectangle")
         {
-            fin >> rectColor >> rectX >> rectY >> rectVx >> rectVy >> rectColorR >> rectColorG >> rectColorB >> rectW >> rectH;
+            fin >> rectLabel >> rectX >> rectY >> rectVx >> rectVy >> rectColorR >> rectColorG >> rectColorB >> rectW >> rectH;
 
             sf::Vector2f rSize(rectW, rectH);
             sf::RectangleShape rect(rSize);
@@ -66,6 +74,8 @@ int main()
             rectangles.push_back(rect);
             rectanglesVx.push_back(rectVx);
             rectanglesVy.push_back(rectVy);
+            sf::Text text(rectLabel, myFont, fontSize);
+            rectanglesLabel.push_back(text);
         }else if (name=="Buffer")
         {
             fin >> winBuff;
@@ -81,21 +91,8 @@ int main()
     // create window of size w*h pixels
     // top left of window is (0,0) and bottom right is (w,h)
 
-    sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), "SFML works!");
+    sf::RenderWindow window(sf::VideoMode(wWidth, wHeight), "Bouncing Balls");
     window.setFramerateLimit(60);
-
-    // start Font instance, load Font and check for success
-    sf::Font myFont;
-
-    if(!myFont.loadFromFile(fontLoc))
-    {
-        std::cerr << "Could not load font!\n";
-        exit(-1);
-    }
-
-    // place text
-    sf::Text text("SAMPLE TEXT sample text", myFont, fontSize);
-    text.setPosition(0, wHeight-(float)text.getCharacterSize());
 
     // main loop
     while (window.isOpen())
@@ -121,14 +118,23 @@ int main()
 
         window.clear();
 
+        sf::Vector2f bgSize(window.getSize().x, window.getSize().y);
+        sf::RectangleShape background(bgSize);
+        //background.setPosition(0, 0);
+        background.setFillColor(sf::Color(91,79,255));
+        window.draw(background);
+
         for (int ind = 0; ind < circles.size(); ++ind)
         {
             auto& circ = circles[ind];
             auto& cVx = circlesVx[ind];
             auto& cVy = circlesVy[ind];
+            auto& cLabel = circlesLabel[ind];
 
-            window.draw(circles[ind]);
             circ.setPosition(circ.getPosition().x + cVx, circ.getPosition().y + cVy);
+            cLabel.setPosition(circ.getPosition().x, circ.getPosition().y);
+            window.draw(circ);
+            window.draw(cLabel);
 
             if (circ.getPosition().x < 0 - winBuff || circ.getPosition().x + circ.getRadius()*2.0 > wWidth + winBuff)
             {
@@ -143,9 +149,12 @@ int main()
             auto& rect = rectangles[ind];
             auto& rVx = rectanglesVx[ind];
             auto& rVy = rectanglesVy[ind];
+            auto& rLabel = rectanglesLabel[ind];
             
-            window.draw(rect);
             rect.setPosition(rect.getPosition().x + rVx, rect.getPosition().y + rVy);
+            rLabel.setPosition(rect.getPosition().x, rect.getPosition().y);
+            window.draw(rect);
+            window.draw(rLabel);
 
             if (rect.getPosition().x < 0 - winBuff || rect.getPosition().x + rect.getSize().x > wWidth + winBuff)
             {
@@ -155,7 +164,11 @@ int main()
                 rVy = -1.0*rVy;
             }
         }
-        window.draw(text);
+        // set and place title
+        sf::Text title("Welcome, traveler.", myFont, fontSize);
+        title.setPosition(winBuff, wHeight-(float)title.getCharacterSize()-winBuff);
+
+        window.draw(title);
         window.display();       // controls OpenGL display buffers
     }
 
