@@ -1,4 +1,48 @@
 #include <iostream>
+#include <vector>
+#include <map>
+
+// An Entity is just a container for components
+//
+// Entity Manager
+//   handles the creation, storage, and lifetime of 
+//   ALL Entities.
+//   EntityManager functions:
+//      addEntity, removeEntity, storage, bookkeeping
+//   Called Factory design pattern. 
+class Entity
+{
+    // private vars
+    const size_t      m_id    = 0; // unique id for each entity
+    const std::string m_tag   = "Default"; // tag for entity groups
+    bool              m_alive = true;
+// public vars
+public:
+    std::shared_ptr<CTransform> cTransform;
+    std::shared_ptr<CName>      cName;
+    std::shared_ptr<CShape>     cShape;
+    std::shared_ptr<CBBox>      cBBox;
+    // constructor
+    Entity(const std::string& tag, size_t id);
+};
+
+// define obbject shorthands. We will be using vectors of 
+// pointers to entities. Also, creating separate vector
+// maps for entities with specific tags
+typedef std::vector<std::shared_ptr<Entity>> EntityVec;
+typedef std::map   <std::string, EntityVec>  EntityMap;
+class EntityManager
+{
+    EntityVec m_entities
+    EntityMap m_entityMap;
+    size_t    m_totalEntities = 0;
+public:
+    EntityManager();
+    std::shared_ptr<Entity> addEntity(const std:string& tag);
+    EntityVec& getEntities();
+    EntityVec& getEntities(const std::string& tag);
+};
+
 
 // Why are writing our own 2D vector class
 // (SFML already has Vector2f)? We can add other 
