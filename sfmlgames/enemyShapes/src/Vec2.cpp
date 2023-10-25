@@ -14,20 +14,18 @@ Vec2::Vec2(float xin, float yin)
 
 Vec2 Vec2::operator + (const Vec2& rhs) const
 {
-    // TODO
-    return Vec2(0,0);
+    return Vec2(x + rhs.x, y + rhs.y);
 }
 
 Vec2 Vec2::operator - (const Vec2& rhs) const
 {
-    // TODO
-    return Vec2(0,0);
+    return Vec2(x - rhs.x, y - rhs.y);
 }
 
 Vec2 Vec2::operator / (const float val) const
 {
     // TODO
-    return Vec2(0,0);
+    return Vec2(x/val,y/val);
 }
 
 Vec2 Vec2::operator * (const float val) const
@@ -44,7 +42,7 @@ bool Vec2::operator == (const Vec2& rhs) const
 bool Vec2::operator != (const Vec2& rhs) const
 {
     // TODO
-    return false;
+    return (x!=rhs.x || y!=rhs.y);
 }
 
 void Vec2::operator += (const Vec2& rhs)
