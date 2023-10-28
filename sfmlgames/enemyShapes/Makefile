@@ -1,10 +1,12 @@
 CXX		:= g++
 OUTPUT	:= sfmlgame
 
+SFML_DIR := /usr/local/Cellar/sfml/2.6.0
+
 # compiler and linker flags
 CXX_FLAGS := -O3 -std=c++17
 INCLUDES  := -I./src
-LDFLAGS   := -O3 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+LDFLAGS   := -O3 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -L$(SFML_DIR)/lib
 
 # the source files for the ecs game engine
 SRC_FILES := $(wildcard src/*.cpp)

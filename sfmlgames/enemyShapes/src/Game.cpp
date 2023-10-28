@@ -33,7 +33,14 @@ void Game::run()
     while (m_running)
     {
         //m_entities.update();
-
+        sf::Event event;
+        while (m_window.pollEvent(event))
+        {
+            if (event.type == sf::Event::KeyPressed)
+            {
+                std::cout << "Key pressed with code = " << event.key.code << "\n";
+            }
+        }
         //if (!m_paused)
         //{
             // put some of these here, or else
@@ -44,7 +51,6 @@ void Game::run()
         sCollision();
         sUserInput();
 
-        std::cout << "done with game loop";
         // increment the current frame 
         // may need to be moved when pause implemented
         m_currentFrame++;
@@ -158,14 +164,14 @@ void Game::sRender()
     m_window.clear();
 
     // set the position of the shape based on the entity's transform->pos
-    //m_player->cShape->circle.setPosition(m_player->cTransform->pos.x, m_player->cTransform->pos.y);
+    m_player->cShape->circle.setPosition(m_player->cTransform->pos.x, m_player->cTransform->pos.y);
 
     // set the rotation of the shape based on the entity's transform->angle
-    //m_player->cTransform->angle += 1.0f;
-    //m_player->cShape->circle.setRotation(m_player->cTransform->angle);
+    m_player->cTransform->angle += 1.0f;
+    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
 
     // draw the entity's sf::CircleShape
-    //m_window.draw(m_player->cShape->circle);
+    m_window.draw(m_player->cShape->circle);
     //sf::Text title("Welcome, traveler.", m_font, 32);
     //m_window.draw(title);
     m_window.display();
