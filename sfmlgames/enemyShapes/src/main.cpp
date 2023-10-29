@@ -12,8 +12,4 @@ int main()
     Game g("config.txt");
     
     g.run(); 
-    Vec2 v1(100, 100);
-    Vec2 v2(300, 500);
-
-    std::cout << v2.x;
 }

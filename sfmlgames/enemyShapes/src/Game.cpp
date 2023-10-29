@@ -16,10 +16,7 @@ void Game::init(const std::string & path)
     // fin >> m_playerConfig.SR >> m_playerConfig.CR
 
     // setup default window parameters
-    std::cout << "about to create window";
     m_window.create(sf::VideoMode(980, 720), "Assignment 2");
-    //sf::RenderWindow m_window(sf::VideoMode(700, 500), "Bouncing Balls");
-    std::cout << "created window";
     m_window.setFramerateLimit(60);
 
     spawnPlayer();
@@ -32,25 +29,34 @@ void Game::run()
     //       some systems shouldn't (movement / input)
     while (m_running)
     {
-        //m_entities.update();
+        m_entities.update();
         sf::Event event;
         while (m_window.pollEvent(event))
         {
             if (event.type == sf::Event::KeyPressed)
             {
-                std::cout << "Key pressed with code = " << event.key.code << "\n";
+                //std::cout << "Key pressed with code = " << event.key.code << "\n";
+                if (event.key.code == sf::Keyboard::Escape)
+                {
+                    m_paused = !m_paused;
+                }
+            }
+            if (event.type == sf::Event::Closed)
+            {
+                m_window.close();
             }
         }
-        //if (!m_paused)
-        //{
-            // put some of these here, or else
-        //}
-        sRender();
-        sEnemySpawner();
-        sMovement();
-        sCollision();
-        sUserInput();
-
+        if (!m_paused)
+        {
+            sRender();
+            sEnemySpawner();
+            sMovement();
+            sCollision();
+            sUserInput();
+        }else 
+        {
+            sRender();
+        }
         // increment the current frame 
         // may need to be moved when pause implemented
         m_currentFrame++;
