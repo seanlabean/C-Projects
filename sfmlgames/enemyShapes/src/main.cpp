@@ -8,8 +8,6 @@
 
 int main()
 {
-    std::cout << "test";
     Game g("config.txt");
-    
     g.run(); 
 }

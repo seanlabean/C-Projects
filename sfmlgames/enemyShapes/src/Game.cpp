@@ -3,17 +3,33 @@
 #include <iostream>
 #include <fstream>
 
+
 Game::Game(const std::string & config)
 {
     init(config);
 }
 
-void Game::init(const std::string & path)
+void Game::init(const std::string & config)
 {
     // TODO: read in config file here
     //       use premade PlayerConfig, EnemyConfig, BulletConfig variables
-    // std::ifstream fin(path)
-    // fin >> m_playerConfig.SR >> m_playerConfig.CR
+    std::ifstream fin(config);
+    std::string name;
+    std::cout << "reading file" << config << std::flush;
+    fin >> name;
+    std::cout << name << std::flush;
+    while (fin >> name)
+    {
+        std::cout << "made it here? " << std::flush;
+        if (name=="Player")
+        {
+            std::cout << "REALLY" << std::flush;
+            fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> 
+            m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> 
+            m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> 
+            m_playerConfig.V >> m_playerConfig.S;
+        }
+    }
 
     // setup default window parameters
     m_window.create(sf::VideoMode(980, 720), "Assignment 2");
