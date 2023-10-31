@@ -15,21 +15,39 @@ void Game::init(const std::string & config)
     //       use premade PlayerConfig, EnemyConfig, BulletConfig variables
     std::ifstream fin(config);
     std::string name;
-    std::cout << "reading file" << config << std::flush;
+    // NOT WORKING FOR SOME REASON...
     fin >> name;
-    std::cout << name << std::flush;
-    while (fin >> name)
-    {
-        std::cout << "made it here? " << std::flush;
-        if (name=="Player")
-        {
-            std::cout << "REALLY" << std::flush;
-            fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> 
-            m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> 
-            m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> 
-            m_playerConfig.V >> m_playerConfig.S;
-        }
-    }
+    // while (fin >> name)
+    // {
+    //     std::cout << "made it here? " << std::flush;
+    //     if (name=="Player")
+    //     {
+    //         std::cout << "REALLY" << std::flush;
+    //         fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> 
+    //         m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> 
+    //         m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> 
+    //         m_playerConfig.V >> m_playerConfig.S;
+    //     }
+    // }
+    // Hardcoding config params here.
+    // Window 1280 720 60 0
+    // Font fonts/NewHeterodoxMono-Book.otf 24 255 255 255
+    // Player 32 32 5 5 5 5 255 0 0 4 8
+    // Enemy 32 32 3 3 255 255 2 3 8 90 60
+    // Bullet 10 10 20 255 255 255 255 255 255 2 20 90
+
+    m_playerConfig.SR = 42; m_playerConfig.CR = 32; m_playerConfig.FR = 5; m_playerConfig.FG = 5;
+    m_playerConfig.FB = 5; m_playerConfig.OT = 5; m_playerConfig.OR = 255; m_playerConfig.OG = 0; 
+    m_playerConfig.OB = 0; m_playerConfig.V = 4; m_playerConfig.S = 3.;
+
+    m_enemyConfig.SR = 32; m_enemyConfig.CR = 32; m_enemyConfig.OR = 255; m_enemyConfig.OG = 255;
+    m_enemyConfig.OB = 255; m_enemyConfig.OT = 3; m_enemyConfig.VMIN = 60; m_enemyConfig.VMAX = 90;
+    m_enemyConfig.L = 8; m_enemyConfig.SI = 8; m_enemyConfig.SMIN = 3; m_enemyConfig.SMAX = 8;
+
+    m_bulletConfig.SR = 10; m_bulletConfig.CR = 10; m_bulletConfig.FR = 20; m_bulletConfig.FR = 255;
+    m_bulletConfig.FG = 255; m_bulletConfig.FB = 255; m_bulletConfig.OR = 255; m_bulletConfig.OG = 255;
+    m_bulletConfig.OB = 255; m_bulletConfig.OT = 2; m_bulletConfig.V = 20; m_bulletConfig.L = 90;
+    m_bulletConfig.S = 255;
 
     // setup default window parameters
     m_window.create(sf::VideoMode(980, 720), "Assignment 2");
@@ -54,7 +72,7 @@ void Game::run()
                 //std::cout << "Key pressed with code = " << event.key.code << "\n";
                 if (event.key.code == sf::Keyboard::Escape)
                 {
-                    m_paused = !m_paused;
+                    setPaused(m_paused);
                 }
             }
             if (event.type == sf::Event::Closed)
@@ -81,7 +99,7 @@ void Game::run()
 
 void Game::setPaused(bool paused)
 {
-    //TODO, just set the variable
+    m_paused = !m_paused;
 }
 
 // respawn the player in the middle of the screen
@@ -97,7 +115,7 @@ void Game::spawnPlayer()
     entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0);
 
     // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
-    entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
+    entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.S, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
 
     // Add an input component to the player so that we can use inputs
     entity->cInput = std::make_shared<CInput>();
