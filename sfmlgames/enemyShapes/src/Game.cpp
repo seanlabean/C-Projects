@@ -208,7 +208,7 @@ void Game::sEnemySpawner()
     //
     //      (use m_currentFrame - m_lastEnemySpawnTime) to determine 
     //      how long it has been since the last enemy spawned - DONE
-    if (m_currentFrame - m_lastEnemySpawnTime > 200)
+    if (m_currentFrame - m_lastEnemySpawnTime > 100)
     {
         spawnEnemy();
     }
@@ -222,8 +222,8 @@ void Game::sRender()
     m_window.clear();
 
  
-    //sf::Text title("Welcome, traveler.", m_font, 32);
-    //m_window.draw(title);
+    // sf::Text title("Welcome, traveler.", m_font, 32);
+    // m_window.draw(title);
 
     for (auto e : m_entities.getEntities())
     {
