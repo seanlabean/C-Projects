@@ -111,8 +111,11 @@ void Game::spawnPlayer()
     // This returns a std::shared_ptr<Entity>, so we use 'auto; to save typing
     auto entity = m_entities.addEntity("player");
 
+    float mx = m_window.getSize().x / 2.0f;
+    float my = m_window.getSize().y / 2.0f;
+
     //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
-    entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0);
+    entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0);
 
     // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
     entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.S, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
@@ -131,6 +134,16 @@ void Game::spawnEnemy()
     // TODO: make sure the enemy is spawned properly with the m_enemyConfig variables
     //       the enemy must be spawned completely within the bounds of the window
     //
+    auto entity = m_entities.addEntity("enemy");
+
+    float ex = rand() % m_window.getSize().x; // NOT correct, need to account for shape radius.
+    float ey = rand() % m_window.getSize().y;
+
+    //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0.0f, 0.0f), 0.0);
+
+    // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
+    entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, m_enemyConfig.SMAX, sf::Color(0, 0, 0), sf::Color(255, 255, 255), 4.0f);
 
     // record when the cmost recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
@@ -194,7 +207,12 @@ void Game::sEnemySpawner()
     // TODO: code which implements enemy spawning should go here
     //
     //      (use m_currentFrame - m_lastEnemySpawnTime) to determine 
-    //      how long it has been since the last enemy spawned
+    //      how long it has been since the last enemy spawned - DONE
+    if (m_currentFrame - m_lastEnemySpawnTime > 200)
+    {
+        spawnEnemy();
+    }
+
 }
 
 void Game::sRender()
@@ -203,17 +221,22 @@ void Game::sRender()
     //       sample drawing of the player Entity that we have created
     m_window.clear();
 
-    // set the position of the shape based on the entity's transform->pos
-    m_player->cShape->circle.setPosition(m_player->cTransform->pos.x, m_player->cTransform->pos.y);
-
-    // set the rotation of the shape based on the entity's transform->angle
-    m_player->cTransform->angle += 1.0f;
-    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
-
-    // draw the entity's sf::CircleShape
-    m_window.draw(m_player->cShape->circle);
+ 
     //sf::Text title("Welcome, traveler.", m_font, 32);
     //m_window.draw(title);
+
+    for (auto e : m_entities.getEntities())
+    {
+        // set the position of the shape based on the entity's transform->pos
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
+
+        // set the rotation of the shape based on the entity's transform->angle
+        e->cTransform->angle += 1.0f;
+        e->cShape->circle.setRotation(e->cTransform->angle);
+
+        // draw the entity's sf::CircleShape
+        m_window.draw(e->cShape->circle);
+    }
     m_window.display();
 }
 
