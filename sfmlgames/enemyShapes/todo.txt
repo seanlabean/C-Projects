@@ -1,0 +1,18 @@
+It's recommended to approach the assignment in the following order:
+[ ] Save the configuration file reading until later, after entities are create
+[x] Implement the Vec2 class, which you will use for all Components
+[x] Implement that basic functionality in the EntityManager class
+        Implement the EntityManager's addEntity() and update() funcitons so
+        you can start testing the Game class quickly. Don't worry about the update()
+        function which removes dead enemies until later when you get more game 
+        mechanics working.
+[ ] Implement the basics of the Game class:
+        a. Construct a player Entity using the spawnPlayer() function
+        b. Implement basic drawing of entities using the Game::sRender() function
+        c. Construct some enemies using the spawnEnemy() function
+        d. Construct a bullet using the spawnBullet() function
+[x] Implement Player Movement in Game::sUserInput and Game::sMovement
+[ ] Implement the EntityManager::update() function so it deletes dead entities
+[ ] Implement the EntityManager::getEntities(tag) functionality
+[ ] Implement collisions in sCollision and entity.destroy() if it's dead
+[ ] Implement the rest of the game's functionality, including the config file reading

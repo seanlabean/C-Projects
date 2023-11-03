@@ -75,10 +75,10 @@ void Game::run()
                     setPaused(m_paused);
                 }
             }
-            if (event.type == sf::Event::Closed)
-            {
-                m_window.close();
-            }
+            // if (event.type == sf::Event::Closed)
+            // {
+            //     m_window.close();
+            // }
         }
         if (!m_paused)
         {
@@ -99,7 +99,7 @@ void Game::run()
 
 void Game::setPaused(bool paused)
 {
-    m_paused = !m_paused;
+    m_paused = !paused;
 }
 
 // respawn the player in the middle of the screen
@@ -166,6 +166,12 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 & target)
     // TODO implement the spawning of a bullet which travels toward target
     //      - bullet speed is given as a scalar speed
     //      - you must set the velocity by using formula in notes
+
+    //example
+    auto bullet = m_entities.addEntity("bullet");
+
+    bullet->cTransform = std::make_shared<CTransform>(target, Vec2(0, 0), 0);
+    bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2);
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
@@ -177,6 +183,22 @@ void Game::sMovement()
 {
     // TODO: implement all entity movement in this function
     //       you should read the m_player->cInput component to determine if the player is moving
+
+    m_player->cTransform->velocity = {0.0, 0.0};
+    // implement player movement
+    if (m_player->cInput->up)
+    {
+        m_player->cTransform->velocity.y = -5;
+    } else if (m_player->cInput->down)
+    {
+        m_player->cTransform->velocity.y = 5;
+    } else if (m_player->cInput->left)
+    {
+        m_player->cTransform->velocity.x = -5;
+    } else if (m_player->cInput->right)
+    {
+        m_player->cTransform->velocity.x = 5;
+    }
 
     // Sample movement speed update
     m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
@@ -242,5 +264,78 @@ void Game::sRender()
 
 void Game::sUserInput()
 {
+    // TODO: handle user input here
+    //       note that you should only be setting the player's input component variables here
+    //       you should not implement the player's movement logic here
+    //       the movement system will read the variables you set in this function
 
+    sf::Event event;
+    while (m_window.pollEvent(event))
+    {
+        // this event triggers when the window is closed
+        if (event.type == sf::Event::Closed)
+        {
+            m_running = false;
+        }
+        // this event is triggered when a key is pressed
+        if (event.type == sf::Event::KeyPressed)
+        {
+            switch (event.key.code)
+            {
+            // case sf::Keyboard::Escape:
+            //      setPaused(m_paused);
+            //      std::cout << "Game Paused...\n";
+            //      break;
+            case sf::Keyboard::W:
+                std::cout << "W Key Pressed\n";
+                m_player->cInput->up = true;
+            case sf::Keyboard::S:
+                std::cout << "S Key Pressed\n";
+                m_player->cInput->down = true;
+            case sf::Keyboard::A:
+                std::cout << "A Key Pressed\n";
+                m_player->cInput->left = true;
+            case sf::Keyboard::D:
+                std::cout << "D Key Pressed\n";
+                m_player->cInput->right = true;
+            case sf::Keyboard::Space:
+                std::cout << "SPACE pressed!\n";
+            default: break;
+            }
+        }
+        if (event.type == sf::Event::KeyReleased)
+        {
+            switch (event.key.code)
+            {
+            case sf::Keyboard::W:
+                std::cout << "W Key Released\n";
+                m_player->cInput->up = false;
+            case sf::Keyboard::S:
+                std::cout << "S Key Released\n";
+                m_player->cInput->down = false;
+            case sf::Keyboard::A:
+                std::cout << "A Key Released\n";
+                m_player->cInput->left = false;
+            case sf::Keyboard::D:
+                std::cout << "D Key Released\n";
+                m_player->cInput->right = false;
+            default: break;
+            }
+        }
+        
+        if (event.type == sf::Event::Closed)
+        {
+            m_window.close();
+        }
+
+        if (event.type == sf::Event::MouseButtonPressed)
+        {
+            if (event.mouseButton.button == sf::Mouse::Left)
+            {
+                std::cout << "Left mouse button clicked at (" << event.mouseButton.x << ", "<< event.mouseButton.y << ")\n";
+                spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
+                // call spawnBullet here
+            }
+        }
+    }
 }
