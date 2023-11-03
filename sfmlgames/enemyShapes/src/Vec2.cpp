@@ -24,13 +24,11 @@ Vec2 Vec2::operator - (const Vec2& rhs) const
 
 Vec2 Vec2::operator / (const float val) const
 {
-    // TODO
     return Vec2(x/val,y/val);
 }
 
 Vec2 Vec2::operator * (const float val) const
 {
-    // TODO
     return Vec2(x*val, y*val);
 }
 
@@ -41,37 +39,45 @@ bool Vec2::operator == (const Vec2& rhs) const
 
 bool Vec2::operator != (const Vec2& rhs) const
 {
-    // TODO
     return (x!=rhs.x || y!=rhs.y);
 }
 
-void Vec2::operator += (const Vec2& rhs)
+Vec2 Vec2::operator += (const Vec2& rhs)
 {
-    // TODO
+    x+=rhs.x;
+    y+=rhs.y;
+    return *this;
 }
 
-void Vec2::operator -= (const Vec2& rhs)
+Vec2 Vec2::operator -= (const Vec2& rhs)
 {
-    // TODO
+    x-=rhs.x;
+    y-=rhs.y;
+    return *this;
 }
 
-void Vec2::operator *= (const float val)
+Vec2 Vec2::operator *= (const float val)
 {
-    // TODO
+    x*=val;
+    y*=val;
+    return *this;
 }
 
-void Vec2::operator /= (const float val)
+Vec2 Vec2::operator /= (const float val)
 {
-    // TODO
+    x/=val;
+    y/=val;
+    return *this;
 }
 
 float Vec2::dist(const Vec2& rhs) const
 {
-    // TODO
-    return 0;
+    Vec2 D;
+    D = *this - rhs;
+    return sqrtf(D.x*D.x + D.y*D.y);
 }
 
 float Vec2::length() const
 {
-    return 0;
+    return sqrtf(x*x + y*y);
 }

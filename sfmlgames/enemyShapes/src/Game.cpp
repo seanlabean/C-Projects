@@ -3,17 +3,51 @@
 #include <iostream>
 #include <fstream>
 
+
 Game::Game(const std::string & config)
 {
     init(config);
 }
 
-void Game::init(const std::string & path)
+void Game::init(const std::string & config)
 {
     // TODO: read in config file here
     //       use premade PlayerConfig, EnemyConfig, BulletConfig variables
-    // std::ifstream fin(path)
-    // fin >> m_playerConfig.SR >> m_playerConfig.CR
+    std::ifstream fin(config);
+    std::string name;
+    // NOT WORKING FOR SOME REASON...
+    fin >> name;
+    // while (fin >> name)
+    // {
+    //     std::cout << "made it here? " << std::flush;
+    //     if (name=="Player")
+    //     {
+    //         std::cout << "REALLY" << std::flush;
+    //         fin >> m_playerConfig.SR >> m_playerConfig.CR >> m_playerConfig.FR >> 
+    //         m_playerConfig.FG >> m_playerConfig.FB >> m_playerConfig.OR >> 
+    //         m_playerConfig.OG >> m_playerConfig.OB >> m_playerConfig.OT >> 
+    //         m_playerConfig.V >> m_playerConfig.S;
+    //     }
+    // }
+    // Hardcoding config params here.
+    // Window 1280 720 60 0
+    // Font fonts/NewHeterodoxMono-Book.otf 24 255 255 255
+    // Player 32 32 5 5 5 5 255 0 0 4 8
+    // Enemy 32 32 3 3 255 255 2 3 8 90 60
+    // Bullet 10 10 20 255 255 255 255 255 255 2 20 90
+
+    m_playerConfig.SR = 42; m_playerConfig.CR = 32; m_playerConfig.FR = 5; m_playerConfig.FG = 5;
+    m_playerConfig.FB = 5; m_playerConfig.OT = 5; m_playerConfig.OR = 255; m_playerConfig.OG = 0; 
+    m_playerConfig.OB = 0; m_playerConfig.V = 4; m_playerConfig.S = 3.;
+
+    m_enemyConfig.SR = 32; m_enemyConfig.CR = 32; m_enemyConfig.OR = 255; m_enemyConfig.OG = 255;
+    m_enemyConfig.OB = 255; m_enemyConfig.OT = 3; m_enemyConfig.VMIN = 60; m_enemyConfig.VMAX = 90;
+    m_enemyConfig.L = 8; m_enemyConfig.SI = 8; m_enemyConfig.SMIN = 3; m_enemyConfig.SMAX = 8;
+
+    m_bulletConfig.SR = 10; m_bulletConfig.CR = 10; m_bulletConfig.FR = 20; m_bulletConfig.FR = 255;
+    m_bulletConfig.FG = 255; m_bulletConfig.FB = 255; m_bulletConfig.OR = 255; m_bulletConfig.OG = 255;
+    m_bulletConfig.OB = 255; m_bulletConfig.OT = 2; m_bulletConfig.V = 20; m_bulletConfig.L = 90;
+    m_bulletConfig.S = 255;
 
     // setup default window parameters
     m_window.create(sf::VideoMode(980, 720), "Assignment 2");
@@ -38,7 +72,7 @@ void Game::run()
                 //std::cout << "Key pressed with code = " << event.key.code << "\n";
                 if (event.key.code == sf::Keyboard::Escape)
                 {
-                    m_paused = !m_paused;
+                    setPaused(m_paused);
                 }
             }
             if (event.type == sf::Event::Closed)
@@ -65,7 +99,7 @@ void Game::run()
 
 void Game::setPaused(bool paused)
 {
-    //TODO, just set the variable
+    m_paused = !m_paused;
 }
 
 // respawn the player in the middle of the screen
@@ -77,11 +111,14 @@ void Game::spawnPlayer()
     // This returns a std::shared_ptr<Entity>, so we use 'auto; to save typing
     auto entity = m_entities.addEntity("player");
 
+    float mx = m_window.getSize().x / 2.0f;
+    float my = m_window.getSize().y / 2.0f;
+
     //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
-    entity->cTransform = std::make_shared<CTransform>(Vec2(200.0f, 200.0f), Vec2(1.0f, 1.0f), 0.0);
+    entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0);
 
     // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
-    entity->cShape = std::make_shared<CShape>(32.0f, 8, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
+    entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.S, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
 
     // Add an input component to the player so that we can use inputs
     entity->cInput = std::make_shared<CInput>();
@@ -97,6 +134,16 @@ void Game::spawnEnemy()
     // TODO: make sure the enemy is spawned properly with the m_enemyConfig variables
     //       the enemy must be spawned completely within the bounds of the window
     //
+    auto entity = m_entities.addEntity("enemy");
+
+    float ex = rand() % m_window.getSize().x; // NOT correct, need to account for shape radius.
+    float ey = rand() % m_window.getSize().y;
+
+    //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0.0f, 0.0f), 0.0);
+
+    // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
+    entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, m_enemyConfig.SMAX, sf::Color(0, 0, 0), sf::Color(255, 255, 255), 4.0f);
 
     // record when the cmost recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
@@ -160,7 +207,12 @@ void Game::sEnemySpawner()
     // TODO: code which implements enemy spawning should go here
     //
     //      (use m_currentFrame - m_lastEnemySpawnTime) to determine 
-    //      how long it has been since the last enemy spawned
+    //      how long it has been since the last enemy spawned - DONE
+    if (m_currentFrame - m_lastEnemySpawnTime > 100)
+    {
+        spawnEnemy();
+    }
+
 }
 
 void Game::sRender()
@@ -169,17 +221,22 @@ void Game::sRender()
     //       sample drawing of the player Entity that we have created
     m_window.clear();
 
-    // set the position of the shape based on the entity's transform->pos
-    m_player->cShape->circle.setPosition(m_player->cTransform->pos.x, m_player->cTransform->pos.y);
+ 
+    // sf::Text title("Welcome, traveler.", m_font, 32);
+    // m_window.draw(title);
 
-    // set the rotation of the shape based on the entity's transform->angle
-    m_player->cTransform->angle += 1.0f;
-    m_player->cShape->circle.setRotation(m_player->cTransform->angle);
+    for (auto e : m_entities.getEntities())
+    {
+        // set the position of the shape based on the entity's transform->pos
+        e->cShape->circle.setPosition(e->cTransform->pos.x, e->cTransform->pos.y);
 
-    // draw the entity's sf::CircleShape
-    m_window.draw(m_player->cShape->circle);
-    //sf::Text title("Welcome, traveler.", m_font, 32);
-    //m_window.draw(title);
+        // set the rotation of the shape based on the entity's transform->angle
+        e->cTransform->angle += 1.0f;
+        e->cShape->circle.setRotation(e->cTransform->angle);
+
+        // draw the entity's sf::CircleShape
+        m_window.draw(e->cShape->circle);
+    }
     m_window.display();
 }
 

@@ -24,6 +24,7 @@ class Game
     bool                m_paused = false; // whether we update game logic
     bool                m_running = true; // whether the game is running
 
+
     std::shared_ptr<Entity> m_player;
 
     void init(const std::string & config); // initialize game state with a config file path
