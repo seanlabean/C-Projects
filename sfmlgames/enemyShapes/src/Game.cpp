@@ -169,9 +169,13 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 & target)
 
     //example
     auto bullet = m_entities.addEntity("bullet");
+    float b_vx = target.x - entity->cTransform->pos.x;
+    float b_vy = target.y - entity->cTransform->pos.y;
 
     bullet->cTransform = std::make_shared<CTransform>(target, Vec2(0, 0), 0);
+    bullet->cTransform->velocity = {b_vx, b_vy};
     bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2);
+    
 }
 
 void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
@@ -200,9 +204,15 @@ void Game::sMovement()
         m_player->cTransform->velocity.x = 5;
     }
 
+    for (auto e : m_entities.getEntities())
+    {
+        e->cTransform->pos.x += e->cTransform->velocity.x;
+        e->cTransform->pos.y += e->cTransform->velocity.y;
+    }
     // Sample movement speed update
-    m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-    m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+    //m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
+    //m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
+
 }
 
 void Game::sLifespan()
@@ -222,6 +232,13 @@ void Game::sCollision()
 {
     // TODO: implement all proper collisions between entities
     //       be sure to use the collision radius, NOT the shape radius
+    //for (auto b : m_entities.getEntities("bullet"))
+    //{
+    //    for (auto e : m_entities.getEntities("enemy"))
+    //    {
+            // decide whether bullet has hit enemy
+    //    }
+    //}
 }
 
 void Game::sEnemySpawner()
@@ -287,19 +304,19 @@ void Game::sUserInput()
             //      std::cout << "Game Paused...\n";
             //      break;
             case sf::Keyboard::W:
-                std::cout << "W Key Pressed\n";
+                //std::cout << "W Key Pressed\n";
                 m_player->cInput->up = true;
             case sf::Keyboard::S:
-                std::cout << "S Key Pressed\n";
+                //std::cout << "S Key Pressed\n";
                 m_player->cInput->down = true;
             case sf::Keyboard::A:
-                std::cout << "A Key Pressed\n";
+                //std::cout << "A Key Pressed\n";
                 m_player->cInput->left = true;
             case sf::Keyboard::D:
-                std::cout << "D Key Pressed\n";
+                //std::cout << "D Key Pressed\n";
                 m_player->cInput->right = true;
             case sf::Keyboard::Space:
-                std::cout << "SPACE pressed!\n";
+                //std::cout << "SPACE pressed!\n";
             default: break;
             }
         }
@@ -308,16 +325,16 @@ void Game::sUserInput()
             switch (event.key.code)
             {
             case sf::Keyboard::W:
-                std::cout << "W Key Released\n";
+                //std::cout << "W Key Released\n";
                 m_player->cInput->up = false;
             case sf::Keyboard::S:
-                std::cout << "S Key Released\n";
+                //std::cout << "S Key Released\n";
                 m_player->cInput->down = false;
             case sf::Keyboard::A:
-                std::cout << "A Key Released\n";
+                //std::cout << "A Key Released\n";
                 m_player->cInput->left = false;
             case sf::Keyboard::D:
-                std::cout << "D Key Released\n";
+                //std::cout << "D Key Released\n";
                 m_player->cInput->right = false;
             default: break;
             }
@@ -332,7 +349,7 @@ void Game::sUserInput()
         {
             if (event.mouseButton.button == sf::Mouse::Left)
             {
-                std::cout << "Left mouse button clicked at (" << event.mouseButton.x << ", "<< event.mouseButton.y << ")\n";
+                //std::cout << "Left mouse button clicked at (" << event.mouseButton.x << ", "<< event.mouseButton.y << ")\n";
                 spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
                 // call spawnBullet here
             }
