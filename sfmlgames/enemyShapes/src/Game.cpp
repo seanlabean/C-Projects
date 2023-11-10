@@ -169,11 +169,16 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 & target)
 
     //example
     auto bullet = m_entities.addEntity("bullet");
-    float b_vx = target.x - entity->cTransform->pos.x;
-    float b_vy = target.y - entity->cTransform->pos.y;
+    float playerPosX = entity->cTransform->pos.x;
+    float playerPosY = entity->cTransform->pos.y;
+    float b_vx = target.x - playerPosX;
+    float b_vy = target.y - playerPosY;
+    // This velocity is still being scaled weird, based on mouse click distance from player...
+    Vec2 b_vel_n = Vec2(b_vx, b_vy) / Vec2(playerPosX, playerPosY).length();
+    Vec2 b_v = b_vel_n * m_bulletConfig.V;
 
-    bullet->cTransform = std::make_shared<CTransform>(target, Vec2(0, 0), 0);
-    bullet->cTransform->velocity = {b_vx, b_vy};
+    bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, b_v, 0);
+    bullet->cTransform->velocity = {b_v.x, b_v.y};
     bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2);
     
 }
