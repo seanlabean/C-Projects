@@ -58,9 +58,6 @@ void Game::init(const std::string & config)
 
 void Game::run()
 {
-    // TODO: add pause functionality in here
-    //       some systems should function while paused (rendering)
-    //       some systems shouldn't (movement / input)
     while (m_running)
     {
         m_entities.update();
@@ -97,13 +94,11 @@ void Game::spawnPlayer()
     // This returns a std::shared_ptr<Entity>, so we use 'auto; to save typing
     auto entity = m_entities.addEntity("player");
 
+    // Get center of window and add player entity  there
     float mx = m_window.getSize().x / 2.0f;
     float my = m_window.getSize().y / 2.0f;
-
-    //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
     entity->cTransform = std::make_shared<CTransform>(Vec2(mx, my), Vec2(0.0f, 0.0f), 0.0);
 
-    // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
     entity->cShape = std::make_shared<CShape>(m_playerConfig.SR, m_playerConfig.S, sf::Color(10, 10, 10), sf::Color(255, 0, 0), 4.0f);
 
     // Add an input component to the player so that we can use inputs
@@ -178,9 +173,6 @@ void Game::spawnSpecialWeapon(std::shared_ptr<Entity> entity)
 
 void Game::sMovement()
 {
-    // TODO: implement all entity movement in this function
-    //       you should read the m_player->cInput component to determine if the player is moving
-
     m_player->cTransform->velocity = {0.0, 0.0};
     // implement player movement
     if (m_player->cInput->up)
@@ -202,10 +194,6 @@ void Game::sMovement()
         e->cTransform->pos.x += e->cTransform->velocity.x;
         e->cTransform->pos.y += e->cTransform->velocity.y;
     }
-    // Sample movement speed update
-    //m_player->cTransform->pos.x += m_player->cTransform->velocity.x;
-    //m_player->cTransform->pos.y += m_player->cTransform->velocity.y;
-
 }
 
 void Game::sLifespan()
@@ -236,24 +224,16 @@ void Game::sCollision()
 
 void Game::sEnemySpawner()
 {
-    // TODO: code which implements enemy spawning should go here
-    //
-    //      (use m_currentFrame - m_lastEnemySpawnTime) to determine 
-    //      how long it has been since the last enemy spawned - DONE
     if (m_currentFrame - m_lastEnemySpawnTime > 100)
     {
         spawnEnemy();
     }
-
 }
 
 void Game::sRender()
 {
-    // TODO: change the code below to draw ALL of the entities 
-    //       sample drawing of the player Entity that we have created
     m_window.clear();
-
- 
+    // Text draw doesnt work?
     // sf::Text title("Welcome, traveler.", m_font, 32);
     // m_window.draw(title);
 
@@ -274,11 +254,6 @@ void Game::sRender()
 
 void Game::sUserInput()
 {
-    // TODO: handle user input here
-    //       note that you should only be setting the player's input component variables here
-    //       you should not implement the player's movement logic here
-    //       the movement system will read the variables you set in this function
-
     sf::Event event;
     while (m_window.pollEvent(event))
     {
