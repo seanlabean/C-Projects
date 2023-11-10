@@ -41,7 +41,7 @@ void Game::init(const std::string & config)
     m_playerConfig.OB = 0; m_playerConfig.V = 4; m_playerConfig.S = 3.;
 
     m_enemyConfig.SR = 32; m_enemyConfig.CR = 32; m_enemyConfig.OR = 255; m_enemyConfig.OG = 255;
-    m_enemyConfig.OB = 255; m_enemyConfig.OT = 3; m_enemyConfig.VMIN = 60; m_enemyConfig.VMAX = 90;
+    m_enemyConfig.OB = 255; m_enemyConfig.OT = 3; m_enemyConfig.VMIN = -8; m_enemyConfig.VMAX = 8;
     m_enemyConfig.L = 8; m_enemyConfig.SI = 8; m_enemyConfig.SMIN = 3; m_enemyConfig.SMAX = 8;
 
     m_bulletConfig.SR = 10; m_bulletConfig.CR = 10; m_bulletConfig.FR = 20; m_bulletConfig.FR = 255;
@@ -65,21 +65,6 @@ void Game::run()
     {
         m_entities.update();
         sf::Event event;
-        while (m_window.pollEvent(event))
-        {
-            if (event.type == sf::Event::KeyPressed)
-            {
-                //std::cout << "Key pressed with code = " << event.key.code << "\n";
-                if (event.key.code == sf::Keyboard::Escape)
-                {
-                    setPaused(m_paused);
-                }
-            }
-            // if (event.type == sf::Event::Closed)
-            // {
-            //     m_window.close();
-            // }
-        }
         if (!m_paused)
         {
             sRender();
@@ -90,6 +75,7 @@ void Game::run()
         }else 
         {
             sRender();
+            sUserInput();
         }
         // increment the current frame 
         // may need to be moved when pause implemented
@@ -132,20 +118,22 @@ void Game::spawnPlayer()
 void Game::spawnEnemy()
 {
     // TODO: make sure the enemy is spawned properly with the m_enemyConfig variables
-    //       the enemy must be spawned completely within the bounds of the window
-    //
+    //       the enemy must be spawned completely within the bounds of the window.
+    //       Spawn enemy with with random velocity
     auto entity = m_entities.addEntity("enemy");
 
     float ex = rand() % m_window.getSize().x; // NOT correct, need to account for shape radius.
     float ey = rand() % m_window.getSize().y;
 
-    //Give this entity a Transform so it spawns at (200,200) with velocity (1,1) and angle 0
-    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(0.0f, 0.0f), 0.0);
+    double evx = (static_cast<double>(rand()) / RAND_MAX) * (m_enemyConfig.VMAX - m_enemyConfig.VMIN) + m_enemyConfig.VMIN;
+    double evy = (static_cast<double>(rand()) / RAND_MAX) * (m_enemyConfig.VMAX - m_enemyConfig.VMIN) + m_enemyConfig.VMIN;
+
+    entity->cTransform = std::make_shared<CTransform>(Vec2(ex, ey), Vec2(evx, evy), 0.0);
 
     // The entity's shape will have radius 32, 8 sides, dark grey fill and red outline with thickness 4
     entity->cShape = std::make_shared<CShape>(m_enemyConfig.SR, m_enemyConfig.SMAX, sf::Color(0, 0, 0), sf::Color(255, 255, 255), 4.0f);
 
-    // record when the cmost recent enemy was spawned
+    // record when the most recent enemy was spawned
     m_lastEnemySpawnTime = m_currentFrame;
 }
 
@@ -304,10 +292,10 @@ void Game::sUserInput()
         {
             switch (event.key.code)
             {
-            // case sf::Keyboard::Escape:
-            //      setPaused(m_paused);
-            //      std::cout << "Game Paused...\n";
-            //      break;
+            case sf::Keyboard::Escape:
+                  setPaused(m_paused);
+                  std::cout << "Game Paused...\n";
+                  break;
             case sf::Keyboard::W:
                 //std::cout << "W Key Pressed\n";
                 m_player->cInput->up = true;
@@ -356,7 +344,6 @@ void Game::sUserInput()
             {
                 //std::cout << "Left mouse button clicked at (" << event.mouseButton.x << ", "<< event.mouseButton.y << ")\n";
                 spawnBullet(m_player, Vec2(event.mouseButton.x, event.mouseButton.y));
-                // call spawnBullet here
             }
         }
     }
