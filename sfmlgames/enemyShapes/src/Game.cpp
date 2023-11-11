@@ -193,11 +193,31 @@ void Game::sMovement()
     {
         if (e->cShape->circle.getPosition().x > m_window.getSize().x || e->cShape->circle.getPosition().x < 0.0)
         {
-            e->cTransform->velocity.x *= -1.0;
-            e->cTransform->pos.x += e->cTransform->velocity.x;
+            
+            if (e != m_player)
+            { 
+                e->cTransform->velocity.x *= -1.0;
+                e->cTransform->pos.x += e->cTransform->velocity.x; 
+            } else
+            {
+                e->cTransform->velocity.x *= -1.0;
+                e->cTransform->pos.x += e->cTransform->velocity.x;
+                // This is an example of how to port player from one side of screen to other.
+                // This is NOT implemented in y direction yet.
+                
+                // if (m_player->cShape->circle.getPosition().x > m_window.getSize().x)
+                // {
+                //     m_player->cTransform->pos.x = e->cTransform->velocity.x;     
+                // } else if (m_player->cShape->circle.getPosition().x < 0.0)
+                // {
+                //     m_player->cTransform->pos.x = m_window.getSize().x - e->cTransform->velocity.x;
+                // }
+                
+            }
 
         } else if (e->cShape->circle.getPosition().y > m_window.getSize().y || e->cShape->circle.getPosition().y < 0.0)
         {
+            
             e->cTransform->velocity.y *= -1.0;
             e->cTransform->pos.y += e->cTransform->velocity.y;
 
