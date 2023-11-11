@@ -186,11 +186,26 @@ void Game::sMovement()
     {
         m_player->cTransform->velocity.x = 5;
     }
+    // TODO
+    // maybe player-window buffer check, set vel to 0?
 
     for (auto e : m_entities.getEntities())
     {
-        e->cTransform->pos.x += e->cTransform->velocity.x;
-        e->cTransform->pos.y += e->cTransform->velocity.y;
+        if (e->cShape->circle.getPosition().x > m_window.getSize().x || e->cShape->circle.getPosition().x < 0.0)
+        {
+            e->cTransform->velocity.x *= -1.0;
+            e->cTransform->pos.x += e->cTransform->velocity.x;
+
+        } else if (e->cShape->circle.getPosition().y > m_window.getSize().y || e->cShape->circle.getPosition().y < 0.0)
+        {
+            e->cTransform->velocity.y *= -1.0;
+            e->cTransform->pos.y += e->cTransform->velocity.y;
+
+        } else
+        {
+            e->cTransform->pos.x += e->cTransform->velocity.x ;
+            e->cTransform->pos.y += e->cTransform->velocity.y;
+        }
     }
 }
 
