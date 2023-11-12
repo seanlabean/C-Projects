@@ -160,7 +160,8 @@ void Game::spawnBullet(std::shared_ptr<Entity> entity, const Vec2 & target)
 
     bullet->cTransform = std::make_shared<CTransform>(m_player->cTransform->pos, b_v, 0);
     bullet->cTransform->velocity = b_v;
-    bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(255, 255, 255), sf::Color(255, 0, 0), 2);
+    bullet->cShape = std::make_shared<CShape>(10, 8, sf::Color(100, 100, 100), sf::Color(255, 0, 0), 2);
+    //bullet->cLifespan->total = 100;
     
 }
 
@@ -204,7 +205,7 @@ void Game::sMovement()
                 e->cTransform->pos.x += e->cTransform->velocity.x;
                 // This is an example of how to port player from one side of screen to other.
                 // This is NOT implemented in y direction yet.
-                
+
                 // if (m_player->cShape->circle.getPosition().x > m_window.getSize().x)
                 // {
                 //     m_player->cTransform->pos.x = e->cTransform->velocity.x;     
@@ -240,6 +241,20 @@ void Game::sLifespan()
     //          scale its alpha channel properly
     //      if it has a lifespan and its time is up
     //          destroy the entity
+    for (auto e : m_entities.getEntities())
+    {
+        if (e->cLifespan)
+        {
+            if (e->cLifespan->remaining > 0)
+            {
+                e->cLifespan->remaining -= 1;
+
+            } else
+            {
+                e->destroy();
+            }
+        }
+    }
 }
 
 void Game::sCollision()

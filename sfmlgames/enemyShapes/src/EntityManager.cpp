@@ -1,5 +1,5 @@
 #include "EntityManager.h"
-
+#include <iostream>
 EntityManager::EntityManager()
 {
 
@@ -34,13 +34,14 @@ void EntityManager::removeDeadEntities(EntityVec & vec)
     //       this is called by the update() function
 
     // look at std::remove_if
-    //for (auto e : vec)
-    //{
-     //   if (!e->isActive())
-      //  {
-
-      //  }
-    //}
+    for (auto e : vec)
+    {
+       if (!e->isActive())
+       {
+            //std::remove_if(0,sizeof(vec),e->)
+            std::cout <<e->tag()<< std::flush;
+       }
+    }
 }
 
 std::shared_ptr<Entity> EntityManager::addEntity(const std::string & tag)

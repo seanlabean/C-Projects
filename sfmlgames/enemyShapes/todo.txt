@@ -6,7 +6,7 @@ It's recommended to approach the assignment in the following order:
         you can start testing the Game class quickly. Don't worry about the update()
         function which removes dead enemies until later when you get more game 
         mechanics working.
-[ ] Implement the basics of the Game class:
+[x] Implement the basics of the Game class:
         a. Construct a player Entity using the spawnPlayer() function
         b. Implement basic drawing of entities using the Game::sRender() function
         c. Construct some enemies using the spawnEnemy() function
