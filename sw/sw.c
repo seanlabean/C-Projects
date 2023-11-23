@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-int
-main()
+int main()
 {
 	/* Init timing ints, prompt and check user input */
 	int h = -1, m = -1, s = -1, t = 0;
