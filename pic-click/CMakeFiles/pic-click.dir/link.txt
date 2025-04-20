@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic "CMakeFiles/pic-click.dir/src/draw.c.o" "CMakeFiles/pic-click.dir/src/init.c.o" "CMakeFiles/pic-click.dir/src/input.c.o" "CMakeFiles/pic-click.dir/src/main.c.o" "CMakeFiles/pic-click.dir/src/scene.c.o" -o pic-click  -lSDL2 -lSDL2_mixer -lSDL2 -lSDL2_image -lSDL2 -lSDL2_ttf -lSDL2 -lm -lSDL2_mixer -lSDL2_image -lSDL2_ttf -lm 

@@ -1,0 +1,4 @@
+#define SCREEN_WIDTH  256
+#define SCREEN_HEIGHT 256
+
+#define MAX_MOUSE_BUTTONS 6

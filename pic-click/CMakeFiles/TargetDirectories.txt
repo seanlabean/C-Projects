@@ -1,0 +1,3 @@
+/home/sean/GitRepos/cgames/pic-click/CMakeFiles/pic-click.dir
+/home/sean/GitRepos/cgames/pic-click/CMakeFiles/edit_cache.dir
+/home/sean/GitRepos/cgames/pic-click/CMakeFiles/rebuild_cache.dir
